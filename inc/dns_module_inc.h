@@ -1,0 +1,44 @@
+#ifndef DNS_MODULE_INC_H
+#define DNS_MODULE_INC_H
+
+#include "main_inc.h" 
+
+
+
+
+
+
+
+
+#define DNS_MAXLABEL	63	/* + 1 '\0' */
+#define DNS_MAXNAME	255	/* + 1 '\0' */
+
+#define QR_QUERY 0
+#define QR_RESPONSE 1
+
+#define OPCODE_STANDART 0
+#define OPCODE_INVERSE 1
+#define OPCODE_STATUS_REQUEST 2
+
+#define AA_VALID 1
+#define AA_NOT_VALID 0
+
+#define TC_TRUNCATED 1
+#define TC_NOT_TRUNCATED 0
+
+#define RD_RECURSION_ALLOWED 1
+#define RD_RECURSION_NOT_ALLOWED 0
+
+#define RA_RECURSION_ALLOWED 1
+#define RA_RECURSION_NOT_ALLOWED 0
+
+#define RCODE_NO_ERROR 0
+#define RCODE_FORMAT_ERROR 1
+#define RCODE_SERVER_FAILURE_ERROR 2
+#define RCODE_NAME_ERROR 3
+#define RCODE_NOT_IMPLEMENTED_ERROR 4
+#define RCODE_REFUSED_ERROR 5
+
+
+
+#endif

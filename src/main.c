@@ -1,10 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <ctype.h>
-#include <stdbool.h>
 
-#include <utils.h>
+#include "main_inc.h"
+#include "utils.h"
 
 void help(void);
 
