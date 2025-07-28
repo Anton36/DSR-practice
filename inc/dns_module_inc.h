@@ -16,7 +16,7 @@
 #define QR_QUERY 0
 #define QR_RESPONSE 1
 
-#define OPCODE_STANDART 0
+#define OPCODE_STANDARD 0
 #define OPCODE_INVERSE 1
 #define OPCODE_STATUS_REQUEST 2
 

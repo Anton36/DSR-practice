@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
     printf("Number of threads: %d\n", number_of_threads);
     printf("Working time: %d seconds\n", working_time);
     printf("File: %s\n", file);
+    get_lines_from_file(file);
     return 0;
 }
 
