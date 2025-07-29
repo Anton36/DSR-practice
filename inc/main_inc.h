@@ -8,3 +8,4 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <string.h>
+#include <netinet/in.h>

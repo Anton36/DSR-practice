@@ -12,6 +12,7 @@
 
 #define DNS_MAXLABEL	63	/* + 1 '\0' */
 #define DNS_MAXNAME	255	/* + 1 '\0' */
+#define MAX_UDP_MESSAGE_SIZE 512
 
 #define QR_QUERY 0
 #define QR_RESPONSE 1

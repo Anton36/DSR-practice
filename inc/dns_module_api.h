@@ -8,7 +8,7 @@
 void make_dns_request(char * line);
 char *get_qname_from_line(char *domain,int * qname_len);
 
-
+#pragma pack(push, 1)
 struct dns_header {
 		unsigned qid:16; //id for packet
 		unsigned qr:1; // 1 bit for specified is a query(0) or response(1)
@@ -25,5 +25,11 @@ struct dns_header {
 		unsigned arcount:16; // number of resource records in the additional records section
 
 }; 
+#pragma pack(pop)
 
+struct dns_question
+{
+    unsigned short qtype;
+    unsigned short qclass;
+};
 #endif
