@@ -46,6 +46,7 @@ char *get_qname_from_line(char *domain, int *qname_len)
     }
     char *buffer_offset = qname_buffer; //offset for iterating over buffer
     char *domain_copy = strdup(domain); //copy of string since strdup modifies original string
+    int all_length = 0;
 
     char *token = strtok(domain_copy, "."); //split into tokens with a dot separator
     while (token != NULL)
@@ -58,11 +59,19 @@ char *get_qname_from_line(char *domain, int *qname_len)
             free(domain_copy);
             return NULL;
         }
+        if((all_length + token_length + 1) > DNS_MAXNAME)
+        {
+            fprintf(stderr, "ERROR: qname is out of max size.\n");
+            free(qname_buffer);
+            free(domain_copy);
+            return NULL;
+        }
 
         *buffer_offset++ = (char)token_length; //write token length to buffer
 
         memcpy(buffer_offset, token, token_length);//writing token to buffer
         buffer_offset += token_length; //iteration over token length
+        all_length += token_length + 1;
         token = strtok(NULL, ".");
     }
 
@@ -70,5 +79,5 @@ char *get_qname_from_line(char *domain, int *qname_len)
     *qname_len = buffer_offset - qname_buffer; //calculate the length of the qname
     free(domain_copy);
     return qname_buffer;
-    //TODO buffer overflow check
+    
 }
