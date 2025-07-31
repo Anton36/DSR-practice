@@ -2,6 +2,11 @@
 #include "dns_module_inc.h"
 #include "main_inc.h"
 
+
+
+
+
+
 void make_dns_request(char *line)
 {
     if (line == NULL)
@@ -64,8 +69,10 @@ void make_dns_request(char *line)
     question->qtype = htons(1);  // 1 for A writing
     question->qclass = htons(1); // 1 for internet
 
-    size_t packet_size = sizeof(struct dns_header) + qname_len + sizeof(struct dns_question); // Calculating packet size for storage purposes
+    int packet_size = sizeof(struct dns_header) + qname_len + sizeof(struct dns_question); // Calculating packet size for storage purposes
+    list_push(buf,packet_size);//moving a package to a request list
     free(qname);
+    
 }
 
 char *get_qname_from_line(char *domain, int *qname_len)

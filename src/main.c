@@ -1,6 +1,7 @@
 
 #include "main_inc.h"
 #include "utils.h"
+#include "linked_list_api.h"
 
 void help(void);
 
@@ -13,6 +14,7 @@ int main(int argc, char *argv[])
     char *file = NULL;
     int number_of_threads = 0;
     int working_time = 0;
+
 
     while ((rez = getopt(argc, argv, ":i:a:q:c:t:f:")) != -1) // function for parsing command-line arguments in which we pass input data
     {
@@ -91,7 +93,9 @@ int main(int argc, char *argv[])
     printf("File: %s\n", file);
 
     get_lines_from_file(file);
+    deleteList();
     return 0;
+    //TODO delete list after end of program 
 }
 
 void help(void)

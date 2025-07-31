@@ -5,7 +5,7 @@ INC_DIR = inc
 OUT_DIR = output
 TARGET = $(OUT_DIR)/program
 
-SOURCES = $(SRC_DIR)/main.c $(SRC_DIR)/utils.c $(SRC_DIR)/dns_module.c
+SOURCES = $(SRC_DIR)/main.c $(SRC_DIR)/utils.c $(SRC_DIR)/dns_module.c $(SRC_DIR)/linked_list.c
 OBJECTS = $(patsubst $(SRC_DIR)/%.c,$(OUT_DIR)/%.o,$(SOURCES))
 HEADERS = $(wildcard $(INC_DIR)/*.h)
 

@@ -32,4 +32,6 @@ struct dns_question
     unsigned short qtype;
     unsigned short qclass;
 };
+
+
 #endif
