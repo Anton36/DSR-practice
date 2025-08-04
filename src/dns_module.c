@@ -1,11 +1,7 @@
 #include "dns_module_api.h"
+#include "linked_list_api.h"
 #include "dns_module_inc.h"
 #include "main_inc.h"
-
-
-
-
-
 
 void make_dns_request(char *line)
 {
@@ -15,15 +11,12 @@ void make_dns_request(char *line)
         return;
     }
     unsigned char buf[MAX_UDP_MESSAGE_SIZE]; // buffer for package
-
+    memset(&buf, 0, sizeof(buf));
     int qname_len = 0;
     struct dns_header *header = (struct dns_header *)&buf; // writing header to packet buffer
     unsigned char *qname_section = NULL;                   // pointer for writing qname
     unsigned char *question_section = NULL;                // pointer to write question_section
     struct dns_question *question = NULL;                  // structure for question
-
-    memset(header, 0, sizeof(struct dns_header));
-    memset(&buf, 0, sizeof(buf));
 
     header->qr = QR_QUERY;
     header->opcode = OPCODE_STANDARD;
@@ -70,9 +63,8 @@ void make_dns_request(char *line)
     question->qclass = htons(1); // 1 for internet
 
     int packet_size = sizeof(struct dns_header) + qname_len + sizeof(struct dns_question); // Calculating packet size for storage purposes
-    list_push(buf,packet_size);//moving a package to a request list
+    list_push(buf, packet_size);                                                           // moving a package to a request list
     free(qname);
-    
 }
 
 char *get_qname_from_line(char *domain, int *qname_len)

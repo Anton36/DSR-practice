@@ -8,8 +8,8 @@ static dns_packet_t *start_of_list = NULL;    // starting point for iterators
 
 void list_push(unsigned char *data, int length)
 {
-    dns_packet_t *temp = (dns_packet_t *)malloc(sizeof(dns_packet_t)); // creating and allocating memory for a new node
-    temp->packet = (unsigned char *)malloc(length);                    // allocating space for a package
+    dns_packet_t *temp = malloc(sizeof(dns_packet_t)); // creating and allocating memory for a new node
+    temp->packet = malloc(length);                    // allocating space for a package
     memcpy(temp->packet, data, length);                                // transferring packet data to node memory
     temp->packet_length = length;
     temp->next = dns_packet_query;

@@ -1,4 +1,6 @@
 
+#ifndef MAIN_INC_H
+#define MAIN_INC_H
 
 
 
@@ -9,3 +11,12 @@
 #include <stdbool.h>
 #include <string.h>
 #include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <arpa/inet.h>
+
+
+
+
+#endif
