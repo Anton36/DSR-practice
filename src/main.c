@@ -2,6 +2,7 @@
 #include "main_inc.h"
 #include "utils.h"
 #include "linked_list_api.h"
+#include "dns_perf_api.h"
 
 void help(void);
 
@@ -14,7 +15,8 @@ int main(int argc, char *argv[])
     char *file = NULL;
     int number_of_threads = 0;
     int working_time = 0;
-
+    int P;
+    int M;
 
     while ((rez = getopt(argc, argv, ":i:a:q:c:t:f:")) != -1) // function for parsing command-line arguments in which we pass input data
     {
@@ -48,31 +50,34 @@ int main(int argc, char *argv[])
             QPS = atoi(optarg);
             break;
         case 'c':
-            if (atoi(optarg) == 0)
+            number_of_threads = atoi(optarg);
+            if (number_of_threads <= 0)
             {
-                fprintf(stderr, "Error: number of threads value must be an integer\n \n");
+                fprintf(stderr, "Error: number of threads value must be a positive integer\n \n");
                 help();
                 return 1;
             }
-            number_of_threads = atoi(optarg);
             break;
         case 't':
-            if (atoi(optarg) == 0)
+            working_time = atoi(optarg);
+            if (working_time <= 0)
             {
-                fprintf(stderr, "Error: working time value must be an integer\n \n");
+                fprintf(stderr, "Error: working time value must be a positive integer or zero\n \n");
                 help();
                 return 1;
             }
-            working_time = atoi(optarg);
+
             break;
         case 'f':
             file = optarg;
-            if (fopen(optarg, "r") == NULL) // validating the existence of the file by attempting to open it
+            FILE *fp = fopen(optarg, "r"); // validating the existence of the file by attempting to open it
+            if (fp == NULL)
             {
                 fprintf(stderr, "Error: file not found\n \n");
                 help();
                 return 1;
             }
+            fclose(fp);
             break;
         case ':': // auxiliary argument for cases when a value is not provided for one of the arguments
             fprintf(stderr, "Error: option %c needs a value\n \n", optopt);
@@ -92,10 +97,35 @@ int main(int argc, char *argv[])
     printf("Working time: %d seconds\n", working_time);
     printf("File: %s\n", file);
 
+    P = QPS / number_of_threads; // calculating the number of requests per second for each thread
+    // TODO: M calculation
+
     get_lines_from_file(file);
+    pthread_t *threads = malloc(number_of_threads * sizeof(pthread_t));
+
+    struct thread_arg args;
+    args.P = P;
+    args.working_time = working_time;
+    args.ip = ip;
+    args.port = port;
+
+    for (int i = 0; i < number_of_threads; i++)
+    {
+        if (pthread_create(&threads[i], NULL, thread_body, &args) != 0) // creating a thread for each request
+        {
+            fprintf(stderr, "Error: thread could not be created\n");
+            return 1;
+        }
+    }
+
+    for (int i = 0; i < number_of_threads; ++i)
+    {
+        pthread_join(threads[i], NULL);
+    }
+
     deleteList();
     return 0;
-    //TODO delete list after end of program 
+    // TODO delete list after end of program
 }
 
 void help(void)

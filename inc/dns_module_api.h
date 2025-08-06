@@ -3,6 +3,7 @@
 #include "dns_module_inc.h"
 void make_dns_request(char *line);
 char *get_qname_from_line(char *domain, int *qname_len);
+void* thread_body(void* arg);
 
 
 #pragma pack(push, 1)
@@ -33,5 +34,11 @@ struct dns_question
   unsigned short qtype;
   unsigned short qclass;
 };
+
+
+
+
+
+
 
 #endif

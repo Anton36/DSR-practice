@@ -9,8 +9,8 @@ static dns_packet_t *start_of_list = NULL;    // starting point for iterators
 void list_push(unsigned char *data, int length)
 {
     dns_packet_t *temp = malloc(sizeof(dns_packet_t)); // creating and allocating memory for a new node
-    temp->packet = malloc(length);                    // allocating space for a package
-    memcpy(temp->packet, data, length);                                // transferring packet data to node memory
+    temp->packet = malloc(length);                     // allocating space for a package
+    memcpy(temp->packet, data, length);                // transferring packet data to node memory
     temp->packet_length = length;
     temp->next = dns_packet_query;
     dns_packet_query = temp;
@@ -35,35 +35,36 @@ dns_packet_t *get_dns_packet_list(void) // function to get a pointer to a list, 
     return dns_packet_query;
 }
 
-iterator_t *create_iterator(dns_packet_t *list) //creating an iterator entity
+iterator_t *create_iterator(dns_packet_t *list) // creating an iterator entity
 {
     iterator_t *iter = malloc(sizeof(iterator_t));
     if (iter == NULL)
     {
         return NULL;
     }
-    iter->packet = list; //initialization of the iterator's starting position
+    iter->packet = list; // initialization of the iterator's starting position
     iter->head = list;
     return iter;
-} 
-void delete_iterator(iterator_t *iter)//deleting iterator entity
+}
+void delete_iterator(iterator_t *iter) // deleting iterator entity
 {
     if (iter != NULL)
     {
         free(iter);
     }
 }
-unsigned char *get_dns_packet_from_iterator(iterator_t *iter)
+dns_packet_t *get_dns_packet_from_iterator(iterator_t *iter)
 {
     if (iter->packet == NULL)
     {
-        iter->packet = iter->head; //if the iterator has gone through the entire list, then we return to the beginning of the list
+        iter->packet = iter->head; // if the iterator has gone through the entire list, then we return to the beginning of the list
+        return iter->packet;
     }
     if (iter->packet)
     {
-        unsigned char *packet = iter->packet->packet;//receiving dns package
-        iter->packet = iter->packet->next;//iterate over a list
-        return packet;
+        dns_packet_t *current_packet = iter->packet;
+        iter->packet = iter->packet->next; // advance iterator
+        return current_packet;
     }
     return NULL;
 }

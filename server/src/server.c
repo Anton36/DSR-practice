@@ -31,7 +31,7 @@ int main()
         close(sockfd);
         exit(EXIT_FAILURE);
     }
-    client_address_len = sizeof(cliaddr);
+    
     printf("starting server \n");
     while (true)
     {

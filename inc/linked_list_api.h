@@ -26,7 +26,7 @@ dns_packet_t* get_dns_packet_list(void);
 
 iterator_t * create_iterator(dns_packet_t *list);
 void delete_iterator(iterator_t * iter);
-unsigned char * get_dns_packet_from_iterator(iterator_t * iter);
+dns_packet_t * get_dns_packet_from_iterator(iterator_t * iter);
 
 
 #endif
