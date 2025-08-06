@@ -24,11 +24,11 @@ int check_valid_ip(const char *ip)
             }
             lastPart = 0;
         }
-        else if (atoi(&ch)) // if a number is detected
+        else if (isdigit(ch)) // if a digit is detected
         {
             // add it to our octet
             lastPart *= 10;
-            lastPart += atoi(&ch);
+            lastPart += ch - '0';
         }
         else
         {
