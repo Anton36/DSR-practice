@@ -7,7 +7,7 @@
 int main()
 {
     int sockfd;
-    char buffer[MAX_UDP_MESSAGE_SIZE];
+    unsigned char buffer[MAX_UDP_MESSAGE_SIZE];
     struct sockaddr_in servaddr, cliaddr;
     int recv_len;
     socklen_t client_address_len = sizeof(cliaddr);
@@ -43,12 +43,15 @@ int main()
         {
             buffer[recv_len] = '\0';
             printf("Client with address %s:%d sent packet [length = %d]:\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), recv_len);
-            struct dns_header *dns = (struct dns_header *)buffer;
-            dns->qr = QR_RESPONSE;
-            if (dns->rd == RD_RECURSION_ALLOWED)
+            struct dns_header *header = (struct dns_header *)buffer;
+            printf("Before: QR=%d, RD=%d, RA=%d\n", header->flags.qr, header->flags.rd, header->flags.ra);//
+            header->flags.qr = QR_RESPONSE;
+            if (header->flags.rd == RD_RECURSION_ALLOWED)
             {
-                dns->ra = RA_RECURSION_ALLOWED;
+                header->flags.ra = RA_RECURSION_ALLOWED;
             }
+
+            printf("After: QR=%d, RD=%d, RA=%d\n", header->flags.qr, header->flags.rd, header->flags.ra);
 
             sendto(sockfd, (char *)buffer, recv_len, MSG_CONFIRM, (struct sockaddr *)&cliaddr, client_address_len);
         }

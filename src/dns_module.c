@@ -18,10 +18,10 @@ void make_dns_request(char *line)
     unsigned char *question_section = NULL;                // pointer to write question_section
     struct dns_question *question = NULL;                  // structure for question
 
-    header->qr = QR_QUERY;
-    header->opcode = OPCODE_STANDARD;
-    header->tc = TC_NOT_TRUNCATED;
-    header->rd = RD_RECURSION_ALLOWED;
+    header->flags.qr = QR_QUERY;
+    header->flags.opcode = OPCODE_STANDARD;
+    header->flags.tc = TC_NOT_TRUNCATED;
+    header->flags.rd = RD_RECURSION_ALLOWED;
     header->qdcount = htons(1); // write results to header keeping network order
     header->ancount = htons(0);
     header->nscount = htons(0);
