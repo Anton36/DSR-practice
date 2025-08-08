@@ -12,7 +12,7 @@ void* thread_body(void* arg);
 
 struct thread_statistics
 {
-  double run_time;
+  struct timeval run_time;
   int target_qps;
   int estimated_qps;
   int estimated_rps;

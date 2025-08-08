@@ -1,7 +1,7 @@
 
 #include "dns_perf_inc.h"
 #include "linked_list_api.h"
-#define NUMBER_OF_MESSAGE 100
+#define NUMBER_OF_MESSAGE 200
 void *thread_body(void *arg)
 {
     struct thread_arg *args = (struct thread_arg *)arg;
@@ -14,9 +14,16 @@ void *thread_body(void *arg)
     printf("Thread started with IP: %s, Port: %d, P: %d, Working time: %d seconds\n", args->ip, args->port, args->P, args->working_time);
 
     int sockfd;
+    int M = 20; //TODO M calculation
+    struct timeval start_tv, end_tv;
+    long long start_us, end_us;
+    long long target_time = args->working_time * 1000000;
+    double elapsed_us;
+    double micro_sec_for_send = 1000000 / M;
     unsigned char buffer[NUMBER_OF_MESSAGE][MAX_UDP_MESSAGE_SIZE];
     struct sockaddr_in servaddr, cliaddr[NUMBER_OF_MESSAGE];
     int recv_len;
+    gettimeofday(&start_tv, NULL);
 
     struct mmsghdr msg[NUMBER_OF_MESSAGE]; // TODO change to calculated value k-packet
     struct iovec iov[NUMBER_OF_MESSAGE];   // TODO change to calculated value k-packet
@@ -48,6 +55,13 @@ void *thread_body(void *arg)
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = inet_addr(args->ip);
     servaddr.sin_port = htons(args->port);
+
+    
+
+
+
+
+
 
     for (int i = 0; i < NUMBER_OF_MESSAGE; i++)
     {
@@ -88,6 +102,14 @@ void *thread_body(void *arg)
         close(sockfd);
         
     }
+    gettimeofday(&end_tv, NULL);
+    start_us = start_tv.tv_sec * 1000000 + start_tv.tv_usec;
+    end_us = end_tv.tv_sec * 1000000 + end_tv.tv_usec;
+ 
+
+    elapsed_us = (double)(end_us - start_us);
+    statistic->run_time.tv_sec = elapsed_us / 1000000;
+    statistic->run_time.tv_usec = (int)elapsed_us % 1000000;
 
     close(sockfd);
     delete_iterator(iter); // deleting the iterator
