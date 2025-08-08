@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
             break;
         case 't':
             working_time = atoi(optarg);
-            if (working_time <= 0)
+            if (working_time < 0)
             {
                 fprintf(stderr, "Error: working time value must be a positive integer or zero\n \n");
                 help();
@@ -101,9 +101,9 @@ int main(int argc, char *argv[])
     // TODO: M calculation
 
     get_lines_from_file(file);
-    pthread_t *threads = malloc(number_of_threads * sizeof(pthread_t));
+    pthread_t *threads = malloc(number_of_threads * sizeof(pthread_t)); //allocating memory for thread identifiers
 
-    struct thread_arg args;
+    struct thread_arg args;// structure for the arguments that we will pass to the threads
     args.P = P;
     args.working_time = working_time;
     args.ip = ip;
@@ -120,12 +120,12 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < number_of_threads; ++i)
     {
-        pthread_join(threads[i], NULL);
+        pthread_join(threads[i], NULL);//waiting for the threads to finish working
     }
 
     deleteList();
     return 0;
-    // TODO delete list after end of program
+    
 }
 
 void help(void)
