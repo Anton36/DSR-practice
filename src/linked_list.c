@@ -3,68 +3,86 @@
 #include "main_inc.h"
 #include "dns_module_api.h"
 // list variables are declared statically in this file for encapsulation
-static dns_packet_t *dns_packet_query = NULL; // list with dns packets generated from file
-static dns_packet_t *start_of_list = NULL;    // starting point for iterators
+static dns_packet_t pool[MAX_LIST_SIZE]; // Static array of nodes
+static dns_packet_t *head = NULL;        // Head of the free-list
+static dns_packet_t *start_head = NULL;  // Head of the active static list
 
-void list_push(unsigned char *data, int length)
+void list_init(void)
 {
-    dns_packet_t *temp = malloc(sizeof(dns_packet_t)); // creating and allocating memory for a new node
-    temp->packet = malloc(length);                     // allocating space for a package
-    memcpy(temp->packet, data, length);                // transferring packet data to node memory
-    temp->packet_length = length;
-    temp->next = dns_packet_query;
-    dns_packet_query = temp;
+    for (int i = 0; i < MAX_LIST_SIZE - 1; ++i)
+    {
+        pool[i].next = &pool[i + 1]; // Link each pool node to the next one
+        pool[i].packet_length = 0;
+    }
+    pool[MAX_LIST_SIZE - 1].next = NULL; // the last pool int the list ending the list
+    pool[MAX_LIST_SIZE - 1].packet_length = 0;
+    head = &pool[0]; // give free list link to the first pool element
 }
 
-void deleteList(void) // function to clear the list of DNS requests
+dns_packet_t *alloc_node(void)
 {
-    dns_packet_t *temp = NULL;
-    dns_packet_t *current = dns_packet_query;
-    while (current != NULL)
+    dns_packet_t *node = head; // Take the first free node from the free-list
+    if (!node)
     {
-        temp = current->next;
-        free(current->packet);
-        free(current);
-        current = temp;
+        return NULL;
     }
-    dns_packet_query = NULL;
+    head = node->next; // advance the list
+    node->next = NULL; // detach node from list
+    node->packet_length = 0;
+    return node;
+}
+
+bool list_push(unsigned char *packet, int length)
+{
+    dns_packet_t *node = alloc_node(); // allocating node from pool
+    if (node == NULL)
+    {
+        fprintf(stderr, "pool is full");
+        return false;
+    }
+    memcpy(node->packet, packet, length); // copy dns packet to node
+    node->packet_length = length;         // copy packet length
+    node->next = start_head;              // insert node at the begining of list
+    start_head = node;                    // node become first in list
+    return true;
+}
+
+void deleteList(void)
+{
+    dns_packet_t *node = start_head;
+    while (node != NULL)
+    {
+        // puts node back into poll
+        dns_packet_t *next = node->next;
+        node->next = head;
+        head = node;
+        node = next;
+    }
+    start_head = NULL;
 }
 
 dns_packet_t *get_dns_packet_list(void) // function to get a pointer to a list, will be used in the iterator
 {
-    return dns_packet_query;
+    return start_head;
 }
 
-iterator_t *create_iterator(dns_packet_t *list) // creating an iterator entity
+void create_iterator(iterator_t *iterator, dns_packet_t *list)
 {
-    iterator_t *iter = malloc(sizeof(iterator_t));
-    if (iter == NULL)
-    {
-        return NULL;
-    }
-    iter->packet = list; // initialization of the iterator's starting position
-    iter->head = list;
-    return iter;
+    iterator->head = list;
+    iterator->packet = list;
 }
-void delete_iterator(iterator_t *iter) // deleting iterator entity
+
+dns_packet_t *iterator_next(iterator_t *iterator)
 {
-    if (iter != NULL)
+    if (!iterator->packet) // if current = NULL
     {
-        free(iter);
+        iterator->packet = iterator->head; // start from beging (cycle iteration)
     }
-}
-dns_packet_t *get_dns_packet_from_iterator(iterator_t *iter)
-{
-    if (iter->packet == NULL)
+    dns_packet_t *packet = iterator->packet; // take node
+    if (iterator->packet != NULL)
     {
-        iter->packet = iter->head; // if the iterator has gone through the entire list, then we return to the beginning of the list
-        return iter->packet;
+        iterator->packet = iterator->packet->next; // advance to the next node
     }
-    if (iter->packet)
-    {
-        dns_packet_t *current_packet = iter->packet;
-        iter->packet = iter->packet->next; // advance iterator
-        return current_packet;
-    }
-    return NULL;
+
+    return packet;
 }

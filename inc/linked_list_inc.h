@@ -5,7 +5,7 @@
 #include "main_inc.h"
 #include "dns_module_api.h"
 
-
+#define MAX_LIST_SIZE 20000
 
 
 

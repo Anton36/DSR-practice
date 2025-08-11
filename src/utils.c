@@ -62,3 +62,6 @@ void get_lines_from_file(const char *file) // function for reading file with dns
     if (line)
         free(line);
 }
+
+
+

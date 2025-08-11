@@ -49,20 +49,13 @@ void *thread_body(void *arg)
         close(sockfd);
         return NULL;
     }
+    iterator_t iterator;
+    create_iterator(&iterator,get_dns_packet_list());
 
-    dns_packet_t *dns_packet_query = get_dns_packet_list(); // getting the list of DNS packets
-    iterator_t *iter = create_iterator(dns_packet_query);   // creating an iterator for the list
-    if (iter == NULL)
-    {
-        fprintf(stderr, "Error: iterator could not be created\n");
-        close(sockfd);
-        return NULL;
-    };
     struct thread_statistics *statistic = malloc(sizeof(struct thread_statistics));
     if (statistic == NULL)
     {
         fprintf(stderr, "Error: memory allocation for statistics failed\n");
-        delete_iterator(iter);
         close(sockfd);
         return NULL;
     }
@@ -110,7 +103,7 @@ void *thread_body(void *arg)
         {
             memset(&msg[i], 0, sizeof(struct mmsghdr));
             memset(&iov[i], 0, sizeof(struct iovec));
-            dns_packet_t *dns_packet = get_dns_packet_from_iterator(iter);
+            dns_packet_t *dns_packet = iterator_next(&iterator); //get dns packet from iterator 
 
             // Configure I/O vector with packet data
             iov[i].iov_base = dns_packet->packet;
@@ -193,7 +186,7 @@ void *thread_body(void *arg)
     statistic->target_qps = args->P;
 
     close(sockfd);
-    delete_iterator(iter); // deleting the iterator
+
 
     pthread_exit((void *)statistic); //// Exit thread and return statistics structure
 }

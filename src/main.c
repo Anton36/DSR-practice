@@ -108,8 +108,9 @@ int main(int argc, char *argv[])
     printf("File: %s\n", file);
 
     P = QPS / number_of_threads; // calculating the number of requests per second for each thread
-
+    list_init(); //init list pool 
     get_lines_from_file(file);
+
     pthread_t *threads = malloc(number_of_threads * sizeof(pthread_t)); // allocating memory for thread identifiers
 
     struct thread_arg args; // structure for the arguments that we will pass to the threads

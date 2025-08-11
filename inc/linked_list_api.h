@@ -7,7 +7,7 @@
 
 
 typedef struct dns_packet_t  {
-    unsigned char * packet;
+    unsigned char packet[MAX_UDP_MESSAGE_SIZE];
     int packet_length;
     struct dns_packet_t * next;
 }dns_packet_t;
@@ -19,14 +19,16 @@ typedef struct iterator_t
 } iterator_t;
 
 
+void list_pool_init(void);   
+void list_init(void);       
 
-void deleteList(void);
-void list_push(unsigned char *data, int length);
-dns_packet_t* get_dns_packet_list(void);
 
-iterator_t * create_iterator(dns_packet_t *list);
-void delete_iterator(iterator_t * iter);
-dns_packet_t * get_dns_packet_from_iterator(iterator_t * iter);
 
+bool list_push( unsigned char *packet, int length);
+
+dns_packet_t *get_dns_packet_list(void);
+void deleteList(void);       
+void create_iterator(iterator_t *iterator, dns_packet_t *list);
+dns_packet_t *iterator_next(iterator_t *it);
 
 #endif
