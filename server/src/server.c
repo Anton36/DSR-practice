@@ -31,7 +31,7 @@ int main()
         close(sockfd);
         exit(EXIT_FAILURE);
     }
-    
+
     printf("starting server \n");
     while (true)
     {
@@ -44,7 +44,7 @@ int main()
             buffer[recv_len] = '\0';
             printf("Client with address %s:%d sent packet [length = %d]:\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), recv_len);
             struct dns_header *header = (struct dns_header *)buffer;
-            printf("Before: QR=%d, RD=%d, RA=%d\n", header->flags.qr, header->flags.rd, header->flags.ra);//
+            printf("Before: QR=%d, RD=%d, RA=%d\n", header->flags.qr, header->flags.rd, header->flags.ra); //
             header->flags.qr = QR_RESPONSE;
             if (header->flags.rd == RD_RECURSION_ALLOWED)
             {
@@ -57,5 +57,6 @@ int main()
         }
     }
     close(sockfd);
+    printf("stop server \n");
     return 0;
 }

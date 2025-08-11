@@ -14,20 +14,22 @@ void *thread_body(void *arg)
     printf("Thread started with IP: %s, Port: %d, P: %d, Working time: %d seconds\n", args->ip, args->port, args->P, args->working_time);
 
     int sockfd;
-    int M = 40;                                                                     // TODO M calculation
-    struct timeval start_tv, end_tv, start_time, current_time, last_operation_time; // declaration of structures for working with time
-    bool is_this_first_iteration = true;                                            // flag for skiping time check
-    long long start_us, end_us;                                                     // variables for calculating the total running time of a thread
-    long long target_time = args->working_time * 1000000;                           // thread running time in us
+    int M = 40;                                                           // TODO M calculation
+    struct timeval end_tv, start_time, current_time, last_operation_time; // declaration of structures for working with time
+    // struct timeval test_start, test_end; //for calculating the number of sending intervals
+    bool is_this_first_iteration = true;                  // flag for skiping time check
+    long long start_us, end_us;                           // variables for calculating the total running time of a thread
+    long long target_time = args->working_time * 1000000; // thread running time in us
     double elapsed_us;
+    double run_time_s;
     double micro_sec_for_send = 1000000 / M; // sending interval size
     struct timeval timeout;                  // timeout structure for package receive
     timeout.tv_sec = 0;
-    timeout.tv_usec = 5000;
+    timeout.tv_usec = 10000;                                         // 10ms
     int packets_per_sending = (args->P + M - 1) / M;                 // calculation of the number of packets sent in 1 interval, rounding up
     unsigned char buffer[packets_per_sending][MAX_UDP_MESSAGE_SIZE]; // packet buffer
     struct sockaddr_in servaddr, cliaddr[packets_per_sending];       // Structure for storing server addresses when receiving and sending
-    gettimeofday(&start_tv, NULL);                                   // getting the start time of the thread
+                                                                     // getting the start time of the thread
 
     struct mmsghdr msg[packets_per_sending];
     struct iovec iov[packets_per_sending];
@@ -74,6 +76,9 @@ void *thread_body(void *arg)
     gettimeofday(&start_time, NULL);
     while (1)
     {
+        if (stop_threads) // stop work flag check
+            break;
+
         if (target_time != 0)
         {
             gettimeofday(&current_time, NULL);
@@ -120,22 +125,20 @@ void *thread_body(void *arg)
             msg[i].msg_hdr.msg_controllen = 0;
             msg[i].msg_hdr.msg_flags = 0;
         }
-        int sent = sendmmsg(sockfd, msg, packets_per_sending, 0);
+        int sent = sendmmsg(sockfd, msg, packets_per_sending, MSG_DONTWAIT);
+
         if (sent < 0)
         {
-            fprintf(stderr, "sendmmsg failed \n");
+            // fprintf(stderr, "sendmmsg failed \n");
             statistic->ptk_nsent += packets_per_sending; // Update statistics for failed packet sends
         }
         else
         {
+            statistic->pkt_sent += sent;
 
             if (sent < packets_per_sending)
             {
                 statistic->ptk_nsent += (packets_per_sending - sent); // Update statistics with amount of packet which was successfully sent
-            }
-            else
-            {
-                statistic->pkt_sent += sent; // Update statistics with successfully sent packets
             }
         }
         // Prepare buffer for receive amount of packets we send
@@ -159,22 +162,33 @@ void *thread_body(void *arg)
         int received = recvmmsg(sockfd, msg, packets_per_sending, 0, NULL);
         if (received < 0)
         {
-            fprintf(stderr, "recvmmsg failed \n");
+            // fprintf(stderr, "recvmmsg failed \n");
         }
         else
         {
             statistic->pkt_recv += received; // Update statistics with successfully received packets
         }
+        // gettimeofday(&test_end, NULL);
     }
 
     gettimeofday(&end_tv, NULL); // getting the end time of the thread
     // getting the start time of the thread
-    start_us = start_tv.tv_sec * 1000000 + start_tv.tv_usec;
+    start_us = start_time.tv_sec * 1000000 + start_time.tv_usec;
     end_us = end_tv.tv_sec * 1000000 + end_tv.tv_usec;
     // Calculate elapsed time and store in statistics
     elapsed_us = (double)(end_us - start_us);
-    statistic->run_time.tv_sec = elapsed_us / 1000000;
+
+    /*test variables for calculating the number of sending intervals
+    double elapsed_test_time = (double)(test_end.tv_usec - last_operation_time.tv_usec);
+    double count = 1000000 / elapsed_test_time;
+    */
+
+    run_time_s = (double)elapsed_us / 1000000.0;
+    statistic->run_time.tv_sec = run_time_s;
     statistic->run_time.tv_usec = (int)elapsed_us % 1000000;
+
+    statistic->estimated_qps = statistic->pkt_sent / run_time_s;
+    statistic->estimated_rps = statistic->pkt_recv / run_time_s;
 
     statistic->target_qps = args->P;
 

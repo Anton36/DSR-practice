@@ -56,7 +56,7 @@ void get_lines_from_file(const char *file) // function for reading file with dns
     }
     while ((read = getline(&line, &len, fp)) != -1)
     {
-        make_dns_request(line); //each line is sent to a function to form a request
+        make_dns_request(line); // each line is sent to a function to form a request
     }
     fclose(fp);
     if (line)

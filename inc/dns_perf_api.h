@@ -16,10 +16,10 @@ struct thread_statistics
   int target_qps;
   int estimated_qps;
   int estimated_rps;
-  double pkt_sent;
-  double pkt_recv;
-  double ptk_nsent;
-  double pkt_drop;
+  uint64_t pkt_sent;
+  uint64_t pkt_recv;
+  uint64_t ptk_nsent;
+  uint64_t pkt_drop;
 };
 
 struct thread_arg

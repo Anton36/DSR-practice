@@ -17,8 +17,10 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <sys/time.h>
+#include <signal.h>
+#include <stdatomic.h>
 
-
+extern volatile sig_atomic_t stop_threads;
 
 
 #endif
