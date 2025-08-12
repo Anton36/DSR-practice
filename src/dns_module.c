@@ -51,8 +51,13 @@ void make_dns_request(char *line)
         fprintf(stderr, "ERROR: qname not retrieve.\n");
         return;
     }
+    
+    if (qname_len > (MAX_UDP_MESSAGE_SIZE - sizeof(struct dns_header))) 
+    {
+    fprintf(stderr, "ERROR: qname is too large for the buffer.\n");
+    return;
+    }
     qname_section = buf + sizeof(struct dns_header); // calculating the position for the qname entry
-
     memcpy(qname_section, qname, qname_len); // insert qname into packet buffer
 
     question_section = qname_section + qname_len;       // calculating the position for the question section
@@ -69,6 +74,11 @@ void make_dns_request(char *line)
 
 char *get_qname_from_line(char *domain, int *qname_len)
 {
+    if(domain == NULL)
+    {
+        fprintf(stderr, "ERROR: domain can be NULL.\n");
+        return NULL;
+    }
     char *qname_buffer = malloc(DNS_MAXNAME + 1); // creating a buffer with the maximum size allowed by the specifications
     if (qname_buffer == NULL)
     {

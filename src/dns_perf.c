@@ -1,6 +1,7 @@
 
 #include "dns_perf_inc.h"
 #include "linked_list_api.h"
+#include "utils.h"
 
 void *thread_body(void *arg)
 {

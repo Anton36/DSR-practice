@@ -2,7 +2,7 @@
 #define DNS_PERF_API_H
 
 
-
+#include "dns_perf_inc.h"
 void* thread_body(void* arg);
 
 

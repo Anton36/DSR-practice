@@ -20,7 +20,14 @@
 #include <signal.h>
 #include <stdatomic.h>
 
-extern volatile sig_atomic_t stop_threads;
+
+
+
+
+
+
+
+void sigint_handler(int signum);
 
 
 #endif
